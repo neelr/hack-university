@@ -1,0 +1,13 @@
+{
+	"name": "hack-university",
+	"version": "1.0.0",
+	"description": "A platform for people to teach people about cool informal things!",
+	"main": "app.js",
+	"repository": "https://github.com/neelr/hack-university.git",
+	"author": "Neel Redkar <neel.redkar@outlook.com>",
+	"license": "MIT",
+	"dependencies": {
+		"express": "^4.17.1",
+		"isomorphic-unfetch": "^3.0.0"
+	}
+}
