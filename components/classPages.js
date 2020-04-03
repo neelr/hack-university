@@ -233,6 +233,18 @@ const IndexAdmin = props => {
                         Save!
                     </Button>
                 </Flex>
+                <Flex py="20px">
+                    <Button m="auto" variant="3D" bg="red" onClick={e => {
+                        e.preventDefault()
+                        if (confirm("Are you sure you want to delete this class?")) {
+                            axios.post(`/api/classes/delete/${props.id}`)
+                                .then(d => window.location.href = "/")
+                                .catch(d => window.location.href = "/")
+                        }
+                    }}>
+                        Delete
+                    </Button>
+                </Flex>
             </Box>
         </Flex>
     );

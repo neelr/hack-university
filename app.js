@@ -166,6 +166,27 @@ server.prepare().then(() => {
                     .catch(e => res.sendStatus(404))
             }).catch(e => res.sendStatus(401))
     })
+    app.post("/api/classes/delete/:id", (req, res) => {
+        base("Users")
+            .select({
+                view: "Main",
+                maxRecords: 3,
+                filterByFormula: `{LoginToken} = '${req.cookies.loginToken}'`
+            })
+            .eachPage(records => {
+                let record = records[0]
+                if (!record)
+                    return res.sendStatus(401)
+                if (!record.get("Leading Classes"))
+                    return res.sendStatus(401)
+                if (!record.get("Leading Classes").includes(req.params.id))
+                    return res.sendStatus(401)
+
+                base("Classes").destroy([req.params.id])
+                    .then(e => res.sendStatus(200))
+                    .catch(e => res.sendStatus(404))
+            }).catch(e => res.sendStatus(401))
+    })
     app.post("/api/classes/enroll/:id", (req, res) => {
         base("Users")
             .select({
