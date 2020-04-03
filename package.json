@@ -4,6 +4,7 @@
 	"description": "A platform for people to teach people about cool informal things!",
 	"main": "app.js",
 	"scripts": {
+    "build":"next build",
 		"start": "node .",
 		"dev": "node ."
 	},
