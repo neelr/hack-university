@@ -4,7 +4,8 @@
 	"description": "A platform for people to teach people about cool informal things!",
 	"main": "app.js",
 	"scripts": {
-		"start": "node ."
+		"start": "node .",
+		"dev": "node ."
 	},
 	"repository": "https://github.com/neelr/hack-university.git",
 	"author": "Neel Redkar <neel.redkar@outlook.com>",
@@ -25,7 +26,6 @@
 		"next": "^9.3.3",
 		"nodemailer": "^6.4.6",
 		"react": "^16.13.1",
-		"react-burger-menu": "^2.6.13",
 		"react-dom": "^16.13.1",
 		"react-feather": "^2.0.3",
 		"rebass": "^4.0.7",
