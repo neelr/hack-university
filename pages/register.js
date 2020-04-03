@@ -17,7 +17,14 @@ export default props => {
         as="form"
         onSubmit={e => {
           e.preventDefault();
-          setText(null);
+          setText(<Text
+            textAlign="center"
+            p="10px"
+            fontWeight="bold"
+            color="Yellow"
+          >
+            Registering.....
+          </Text>);
           axios
             .post("/api/signup", {
               email: document.getElementById("email").value,
@@ -25,7 +32,7 @@ export default props => {
               password: String(
                 sha256(
                   document.getElementById("pass").value +
-                    document.getElementById("username").value
+                  document.getElementById("username").value
                 )
               )
             })
