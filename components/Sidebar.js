@@ -42,7 +42,7 @@ export default props => {
                 id="sidebar"
                 sx={{
                     width: "0px",
-                    bg: "secondary",
+                    bg: "primary",
                     transition: "all 0.5s",
                     overflow: "hidden",
                     height: "100vh",
