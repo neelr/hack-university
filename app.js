@@ -15,7 +15,7 @@ var transporter = nodemailer.createTransport({
     secureConnection: false, // TLS requires secureConnection to be false
     port: 587, // port for secure SMTP
     tls: {
-       ciphers:'SSLv3'
+        ciphers: 'SSLv3'
     },
     auth: {
         user: 'hackuniversity@outlook.com',
@@ -57,7 +57,7 @@ server.prepare().then(() => {
                     }
                 ]).then((e) => {
                     transporter.sendMail({
-                        from:`"Hack University" hackuniversity@outlook.com`,
+                        from: `"Hack University" hackuniversity@outlook.com`,
                         to: email,
                         subject: "Verify Email for Hack University",
                         html: `
@@ -113,7 +113,7 @@ server.prepare().then(() => {
                 Verified: true
             }
         }]).then(d => {
-            res.sendStatus(200)
+            res.redirect("https://university.hackclub.com/login")
         }).catch(e => {
             res.sendStatus(404)
         })
