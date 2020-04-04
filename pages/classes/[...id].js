@@ -28,7 +28,7 @@ let Classes = props => {
                 } else if (!(d.data["Leading Classes"] ? d.data["Leading Classes"].includes(router.query.id[0]) : false)) {
                     setPageProps({ id: router.query.id, page: router.query.id.length == 1 ? "indexEnroll" : `${router.query.id[1]}Enroll` })
                 }
-            }).catch(e => window.location.href = "/register")
+            }).catch(e => window.location.href = "/login")
     }, [])
     return (
         <Flex width="100vw">
