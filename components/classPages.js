@@ -31,12 +31,15 @@ const NavLink = ({ sx, ...props }) => (
     </Link>
 )
 const Index = ({ sx, ...props }) => {
+    const [teacher, setTeacher] = useState(null);
     const [resp, setResp] = useState(null);
     useEffect(() => {
         axios
             .get(`/api/classes/${props.id}`)
             .then(r => {
                 setResp(r.data);
+                axios.get(`/api/users/${r.data.Leader[0]}`)
+                    .then(e => setTeacher(e.data.Username))
             })
             .catch(() => console.log(props.id));
     }, []);
@@ -45,6 +48,7 @@ const Index = ({ sx, ...props }) => {
             <Heading mx="auto" my="20px">
                 {resp ? resp["Class Name"] : null}
             </Heading>
+            <Text sx={{ mx: "auto", my: "10px", }}>Teacher: <A href={`/users/${resp ? resp.Leader[0] : ""}`} sx={{ color: "link", textDecorationStyle: "wavy" }}>{`@${teacher}`}</A></Text>
             <I
                 src={resp ? resp["Class Image"][0].url : null}
                 sx={{
