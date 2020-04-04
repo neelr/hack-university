@@ -233,6 +233,18 @@ const IndexAdmin = props => {
                         Save!
                     </Button>
                 </Flex>
+                <Flex py="20px">
+                    <Button m="auto" variant="3D" bg="red" onClick={e => {
+                        e.preventDefault()
+                        if (confirm("Are you sure you want to delete this class?")) {
+                            axios.post(`/api/classes/delete/${props.id}`)
+                                .then(d => window.location.href = "/")
+                                .catch(d => window.location.href = "/")
+                        }
+                    }}>
+                        Delete
+                    </Button>
+                </Flex>
             </Box>
         </Flex>
     );
@@ -413,10 +425,9 @@ const FilesAdmin = (props) => {
                 form.append("file", file.files[0])
                 form.append("name", file.files[0].name)
                 let url = await axios({
-                    method: "post",
-                    url: "https://cors-anywhere.herokuapp.com/uguu.se/api.php?d=upload-tool",
-                    data: form,
-                    headers: { "Content-Type": "multipart/form-data" }
+                    method: "put",
+                    url: "https://cors-anywhere.herokuapp.com/transfer.sh/" + file.files[0].name,
+                    data: file.files[0],
                 })
                 url = url.data
                 let Files = resp.Files ? resp.Files : []
