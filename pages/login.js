@@ -23,7 +23,7 @@ export default props => {
               password: String(
                 sha256(
                   document.getElementById("pass").value +
-                    document.getElementById("username").value
+                  document.getElementById("username").value
                 )
               )
             })
@@ -91,7 +91,7 @@ export default props => {
               Register!
             </Button>
           </Link>
-          <Button m="auto" variant="3D">
+          <Button m="auto" variant="3D" bg="#7E92FF">
             Sign in!
           </Button>
         </Flex>

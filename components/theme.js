@@ -17,7 +17,7 @@ export default {
         background: "#1B1A1F",
         primary: "#FF5A5F",
         secondary: "hsl(10, 60%, 50%)",
-        highlight: "#FF5A5F",
+        highlight: "#F66",
         accent: "#609",
         gray: "#999"
       }
