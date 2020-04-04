@@ -457,7 +457,7 @@ const Students = (props) => {
             .then(async r => {
                 let names = r.data.Students.map(async d => {
                     let name = await axios.get(`/api/users/${d}`)
-                    return <A href={`/users/${d}`} sx={{ color: "link", borderRadius: "10px", textDecorationStyle: "wavy" }} mx="auto" my="10px" p="10px" bg="primary">{name.data.Username}</A>
+                    return <A href={`/users/${d}`} sx={{ color: "link", borderRadius: "10px", textDecorationStyle: "wavy" }} mx="auto" my="10px" p="10px" bg="#AC2901">{name.data.Username}</A>
                 })
                 names = await Promise.all(names)
                 setResp(names)
