@@ -266,7 +266,7 @@ const SectionsEnroll = (props) => {
             {resp ? JSON.parse(resp.Sections).map(v => (
                 <Box sx={{ display: "flex" }} mx="auto" width={["90vw", "50vw", null, "50vw"]} >
                     <Heading fontSize={[3, 4, 5]} m="auto">{v.name}</Heading>
-                    <Flex flexDirection="column" width={["90vw", "50vw", null, "50vw"]} m="auto" dangerouslySetInnerHTML={{ __html: DOM.sanitize(marked(v.text)) }}>
+                    <Flex flexDirection="column" width={["90vw", "50vw", null, "50vw"]} p="30px" m="auto" dangerouslySetInnerHTML={{ __html: DOM.sanitize(marked(v.text)) }}>
                     </Flex>
                     <hr sx={{ mx: "30vw" }} />
                 </Box>
@@ -425,10 +425,9 @@ const FilesAdmin = (props) => {
                 form.append("file", file.files[0])
                 form.append("name", file.files[0].name)
                 let url = await axios({
-                    method: "post",
-                    url: "https://cors-anywhere.herokuapp.com/uguu.se/api.php?d=upload-tool",
-                    data: form,
-                    headers: { "Content-Type": "multipart/form-data" }
+                    method: "put",
+                    url: "https://cors-anywhere.herokuapp.com/transfer.sh/" + file.files[0].name,
+                    data: file.files[0],
                 })
                 url = url.data
                 let Files = resp.Files ? resp.Files : []
