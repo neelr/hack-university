@@ -14,10 +14,10 @@ export default {
     modes: {
       dark: {
         text: "#fff",
-        background: "#232324",
-        primary: "hsl(10, 80%, 50%)",
+        background: "#1B1A1F",
+        primary: "#FF5A5F",
         secondary: "hsl(10, 60%, 50%)",
-        highlight: "hsl(11.3, 73.6%, 65.9%)",
+        highlight: "#FF5A5F",
         accent: "#609",
         gray: "#999"
       }
