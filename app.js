@@ -11,10 +11,15 @@ const server = next({ dev })
 const handle = server.getRequestHandler()
 const app = express()
 var transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: "smtp-mail.outlook.com", // hostname
+    secureConnection: false, // TLS requires secureConnection to be false
+    port: 587, // port for secure SMTP
+    tls: {
+       ciphers:'SSLv3'
+    },
     auth: {
-        user: 'neel.redkar@gmail.com',
-        pass: process.env.GMAIL
+        user: 'hackuniversity@outlook.com',
+        pass: process.env.OUTLOOK
     }
 });
 app.use(express.json())
@@ -52,12 +57,13 @@ server.prepare().then(() => {
                     }
                 ]).then((e) => {
                     transporter.sendMail({
+                        from:`"Hack University" hackuniversity@outlook.com`,
                         to: email,
                         subject: "Verify Email for Hack University",
                         html: `
                             <p>Welcome ${username},</p>
                             <br/>
-                            <p>Thanks for sign up for Hack University! Please <a href="localhost:3000/api/verify/${e[0].id}">verify your email!</a>
+                            <p>Thanks for sign up for Hack University! Please <a href="https://university.hackclub.com/api/verify/${e[0].id}">verify your email!</a>
                             <br/>
                             <p>Thanks so much,</p>
                             <p>Hack University Team</p>

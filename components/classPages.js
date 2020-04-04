@@ -425,10 +425,9 @@ const FilesAdmin = (props) => {
                 form.append("file", file.files[0])
                 form.append("name", file.files[0].name)
                 let url = await axios({
-                    method: "post",
-                    url: "https://cors-anywhere.herokuapp.com/uguu.se/api.php?d=upload-tool",
-                    data: form,
-                    headers: { "Content-Type": "multipart/form-data" }
+                    method: "put",
+                    url: "https://cors-anywhere.herokuapp.com/transfer.sh/" + file.files[0].name,
+                    data: file.files[0],
                 })
                 url = url.data
                 let Files = resp.Files ? resp.Files : []
