@@ -264,12 +264,12 @@ server.prepare().then(() => {
              }).catch(e => res.sendStatus(401))*/
     })
     app.get("/api/classes", (req, res) => {
-        let allClasses = {}
+        let allClasses = []
         base("Classes").select({
             view: "Main"
         }).eachPage((records, next) => {
             records.forEach(record => {
-                allClasses[record.get("Class Name")] = { fields: record.fields, id: record.id }
+                allClasses.push({ fields: record.fields, id: record.id })
             })
             next()
         }).then(d => {

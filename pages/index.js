@@ -12,7 +12,7 @@ const Index = props => {
   useEffect(() => {
     axios.get("/api/classes").then(json => {
       setClasses(json.data);
-      setShownClasses(Object.values(json.data))
+      setShownClasses(json.data)
     });
   }, []);
   return (
@@ -45,7 +45,7 @@ const Index = props => {
             console.log(shownClasses)
             let show = []
             let flag = true
-            Object.values(classes).map(v => {
+            classes.map(v => {
               v.fields.KeyWords.split(",").map(k => {
                 if (k.toLowerCase().includes(e.target.value.toLowerCase()) && flag) {
                   show.push(v)
