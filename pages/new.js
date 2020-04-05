@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Input, Textarea } from "@rebass/forms";
 import { Text, Flex, Heading, Button } from "rebass";
 import Box from "../components/box";
 import axios from "axios";
+import Captcha from "react-google-recaptcha"
 
 export default props => {
   const [text, setText] = useState(null);
+  const captcha = useRef();
   const ValidateImg = (file, done) => {
     let img = new Image()
     img.src = window.URL.createObjectURL(file)
@@ -48,7 +50,8 @@ export default props => {
                     name: document.getElementById("name").value,
                     desc: document.getElementById("desc").value,
                     image: url,
-                    KeyWords: document.getElementById("key").value
+                    KeyWords: document.getElementById("key").value,
+                    captcha: captcha.current.getValue()
                   })
                   .then(d => {
                     window.location.href = `/classes/${d.data.id}`;
@@ -112,6 +115,14 @@ export default props => {
             m="auto"
             required
           />
+        </Flex>
+        <Flex py="20px">
+          <Flex mx="auto">
+            <Captcha
+              ref={captcha}
+              sitekey="6LcvzOYUAAAAAOuU-30rjhvgKl3dtzM1iRcF2uZW"
+            />
+          </Flex>
         </Flex>
         <Flex py="20px">
           <Button m="auto" variant="3D" bg="accent">

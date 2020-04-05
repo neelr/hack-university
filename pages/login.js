@@ -86,14 +86,14 @@ export default props => {
           />
         </Flex>
         <Flex py="20px">
+          <Button m="auto" variant="3D" bg="#7E92FF">
+            Sign in!
+          </Button>
           <Link href="/register">
             <Button m="auto" variant="3D" bg="accent">
               Register!
             </Button>
           </Link>
-          <Button m="auto" variant="3D" bg="#7E92FF">
-            Sign in!
-          </Button>
         </Flex>
       </Box>
     </Flex>
