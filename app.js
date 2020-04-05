@@ -4,12 +4,15 @@ const cookieParser = require("cookie-parser")
 const next = require("next")
 const nodemailer = require("nodemailer")
 const Airtable = require("airtable")
+const rateLimit = require("express-rate-limit");
 const crypto = require("crypto")
 const base = new Airtable({ apiKey: process.env.AIRTABLE }).base(process.env.BASE);
 const dev = process.env.NODE_ENV !== 'production'
 const server = next({ dev })
 const handle = server.getRequestHandler()
 const app = express()
+const limiter = rateLimit();
+
 var transporter = nodemailer.createTransport({
     host: "smtp-mail.outlook.com", // hostname
     secureConnection: false, // TLS requires secureConnection to be false
@@ -24,7 +27,7 @@ var transporter = nodemailer.createTransport({
 });
 app.use(express.json())
 app.use(cookieParser());
-
+app.use(limiter);
 
 server.prepare().then(() => {
     //API ROUTES
