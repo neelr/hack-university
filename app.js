@@ -13,7 +13,7 @@ const dev = process.env.NODE_ENV !== 'production'
 const server = next({ dev })
 const handle = server.getRequestHandler()
 const app = express()
-const limiter = rateLimit({windowMs:1000})
+const limiter = rateLimit({ windowMs: 1000 })
 var captcha = async (token, after) => {
     let resp = await axios.post("https://www.google.com/recaptcha/api/siteverify", qs.stringify({
         secret: process.env.CAPTCHA,
@@ -37,8 +37,6 @@ var transporter = nodemailer.createTransport({
 });
 app.use(express.json())
 app.use(cookieParser());
-
-app.use(limiter);
 
 server.prepare().then(() => {
     //API ROUTES
@@ -72,7 +70,7 @@ server.prepare().then(() => {
                                 }
                             }
                         ]).then((e) => {
-                          res.sendStatus(200)
+                            res.sendStatus(200)
                             transporter.sendMail({
                                 from: `"Hack University" hackuniversity@outlook.com`,
                                 to: email,
