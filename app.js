@@ -4,18 +4,32 @@ const cookieParser = require("cookie-parser")
 const next = require("next")
 const nodemailer = require("nodemailer")
 const Airtable = require("airtable")
+const axios = require("axios")
+const rateLimit = require("express-rate-limit");
+const qs = require("querystring")
 const crypto = require("crypto")
 const base = new Airtable({ apiKey: process.env.AIRTABLE }).base(process.env.BASE);
 const dev = process.env.NODE_ENV !== 'production'
 const server = next({ dev })
 const handle = server.getRequestHandler()
 const app = express()
+const limiter = rateLimit({windowMs:1000})
+
+var captcha = async (token, after) => {
+    let resp = await axios.post("https://www.google.com/recaptcha/api/siteverify", qs.stringify({
+        secret: process.env.CAPTCHA,
+        response: token
+    }))
+    console.log(resp.data)
+    after(resp.data.success)
+}
+
 var transporter = nodemailer.createTransport({
     host: "smtp-mail.outlook.com", // hostname
     secureConnection: false, // TLS requires secureConnection to be false
     port: 587, // port for secure SMTP
     tls: {
-       ciphers:'SSLv3'
+        ciphers: 'SSLv3'
     },
     auth: {
         user: 'hackuniversity@outlook.com',
@@ -24,54 +38,59 @@ var transporter = nodemailer.createTransport({
 });
 app.use(express.json())
 app.use(cookieParser());
-
+app.use(limiter);
 
 server.prepare().then(() => {
     //API ROUTES
     app.post("/api/signup", (req, res) => {
-        let username = req.body.username
-        let password = req.body.password
-        let email = req.body.email
-        let loginToken = crypto.randomBytes(256).toString("hex");
-        let flag = true;
-        base("Users").select({
-            view: "Main",
-            filterByFormula: `Username = '${username}'`
-        }).eachPage((records, next) => {
-            records.forEach(record => {
-                flag = false;
-            })
-            next()
-        }, e => {
-            if (!flag) {
-                res.sendStatus(401)
-            } else {
-                base("Users").create([
-                    {
-                        fields: {
-                            Username: username,
-                            Password: password,
-                            Email: email,
-                            LoginToken: loginToken
-                        }
-                    }
-                ]).then((e) => {
-                    transporter.sendMail({
-                        from:`"Hack University" hackuniversity@outlook.com`,
-                        to: email,
-                        subject: "Verify Email for Hack University",
-                        html: `
-                            <p>Welcome ${username},</p>
-                            <br/>
-                            <p>Thanks for sign up for Hack University! Please <a href="https://university.hackclub.com/api/verify/${e[0].id}">verify your email!</a>
-                            <br/>
-                            <p>Thanks so much,</p>
-                            <p>Hack University Team</p>
-                        `
-                    }).then(e => {
-                        res.sendStatus(200)
+        captcha(req.body.captcha, (success) => {
+            if (success) {
+                let username = req.body.username
+                let password = req.body.password
+                let email = req.body.email
+                let loginToken = crypto.randomBytes(256).toString("hex");
+                let flag = true;
+                base("Users").select({
+                    view: "Main",
+                    filterByFormula: `Username = '${username}'`
+                }).eachPage((records, next) => {
+                    records.forEach(record => {
+                        flag = false;
                     })
+                    next()
+                }, e => {
+                    if (!flag) {
+                        res.sendStatus(401)
+                    } else {
+                        base("Users").create([
+                            {
+                                fields: {
+                                    Username: username,
+                                    Password: password,
+                                    Email: email,
+                                    LoginToken: loginToken
+                                }
+                            }
+                        ]).then((e) => {
+                          res.sendStatus(200)
+                            transporter.sendMail({
+                                from: `"Hack University" hackuniversity@outlook.com`,
+                                to: email,
+                                subject: "Verify Email for Hack University",
+                                html: `
+                                <p>Welcome ${username},</p>
+                                <br/>
+                                <p>Thanks for sign up for Hack University! Please <a href="https://university.hackclub.com/api/verify/${e[0].id}">verify your email!</a>
+                                <br/>
+                                <p>Thanks so much,</p>
+                                <p>Hack University Team</p>
+                            `
+                            })
+                        })
+                    }
                 })
+            } else {
+                res.sendStatus(401)
             }
         })
 
@@ -113,40 +132,46 @@ server.prepare().then(() => {
                 Verified: true
             }
         }]).then(d => {
-            res.sendStatus(200)
+            res.redirect("https://university.hackclub.com/login")
         }).catch(e => {
             res.sendStatus(404)
         })
     })
     app.post("/api/classes/create", (req, res) => {
-        base("Users")
-            .select({
-                view: "Main",
-                maxRecords: 3,
-                filterByFormula: `{LoginToken} = '${req.cookies.loginToken}'`
-            })
-            .eachPage(records => {
-                let record = records[0]
-                if (!record)
-                    return res.sendStatus(401)
-                if (!record.get("Verified"))
-                    return res.sendStatus(401)
-                base("Classes").create([
-                    {
-                        fields: {
-                            "Class Name": req.body.name,
-                            Description: req.body.desc,
-                            "Class Image": [{
-                                url: req.body.image
-                            }],
-                            Leader: [record.id],
-                            KeyWords: req.body.KeyWords
-                        }
-                    }
-                ]).then(d => {
-                    res.send({ id: d[0].id })
-                })
-            }).catch(e => res.sendStatus(401))
+        captcha(req.body.captcha, (success) => {
+            if (success) {
+                base("Users")
+                    .select({
+                        view: "Main",
+                        maxRecords: 3,
+                        filterByFormula: `{LoginToken} = '${req.cookies.loginToken}'`
+                    })
+                    .eachPage(records => {
+                        let record = records[0]
+                        if (!record)
+                            return res.sendStatus(401)
+                        if (!record.get("Verified"))
+                            return res.sendStatus(401)
+                        base("Classes").create([
+                            {
+                                fields: {
+                                    "Class Name": req.body.name,
+                                    Description: req.body.desc,
+                                    "Class Image": [{
+                                        url: req.body.image
+                                    }],
+                                    Leader: [record.id],
+                                    KeyWords: req.body.KeyWords
+                                }
+                            }
+                        ]).then(d => {
+                            res.send({ id: d[0].id })
+                        })
+                    }).catch(e => res.sendStatus(401))
+            } else {
+                res.send({ captcha: true })
+            }
+        })
     })
     app.post("/api/classes/update/:id", (req, res) => {
         base("Users")
@@ -264,12 +289,12 @@ server.prepare().then(() => {
              }).catch(e => res.sendStatus(401))*/
     })
     app.get("/api/classes", (req, res) => {
-        let allClasses = {}
+        let allClasses = []
         base("Classes").select({
             view: "Main"
         }).eachPage((records, next) => {
             records.forEach(record => {
-                allClasses[record.get("Class Name")] = { fields: record.fields, id: record.id }
+                allClasses.push({ fields: record.fields, id: record.id })
             })
             next()
         }).then(d => {

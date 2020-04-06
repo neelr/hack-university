@@ -12,7 +12,7 @@ const Index = props => {
   useEffect(() => {
     axios.get("/api/classes").then(json => {
       setClasses(json.data);
-      setShownClasses(Object.values(json.data))
+      setShownClasses(json.data)
     });
   }, []);
   return (
@@ -32,8 +32,8 @@ const Index = props => {
             p: "20px"
           }}
         >
-          Welcome to Hack University! The best place to teach and learn! Here, its easy to host an online class, or open source
-          your classes already happening online! Here, you can teach anything, from the basics of sowing, to rocket science! To teach, just go to your classes, and ceate a new class! Then, you can add different sections, and add zoom links to meet up with students and lecture! This way, since everything is already going online due to COVID19, we may as well make it open source!
+          Welcome to Hack University! The best place to teach and learn! Here, it's easy to host an online class, or open source
+          your classes already happening online! Here, you can teach anything, from the basics of sewing, to rocket science! To teach, just go to your classes, and create a new class! Then, you can add different sections, and add zoom links to meet up with students and lecture! This way, since everything is already going online due to COVID19, we may as well make it open source!
         </Text>
       </Flex>
       <Flex flexDirection="column">
@@ -45,7 +45,7 @@ const Index = props => {
             console.log(shownClasses)
             let show = []
             let flag = true
-            Object.values(classes).map(v => {
+            classes.map(v => {
               v.fields.KeyWords.split(",").map(k => {
                 if (k.toLowerCase().includes(e.target.value.toLowerCase()) && flag) {
                   show.push(v)

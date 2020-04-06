@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Input, Label } from "@rebass/forms";
 import { Text, Flex, Heading, Button } from "rebass";
 import Box from "../components/box";
 import sha256 from "crypto-js/sha256";
 import axios from "axios";
+import Captcha from "react-google-recaptcha"
 
 export default props => {
   const [text, setText] = useState(null);
+  const captcha = useRef()
   return (
     <Flex p="30px" width="100vw" flexDirection="column">
       <Heading m="auto" fontSize={[4, 5, 6]}>
@@ -34,7 +36,8 @@ export default props => {
                   document.getElementById("pass").value +
                   document.getElementById("username").value
                 )
-              )
+              ),
+              captcha: captcha.current.getValue()
             })
             .then(r => {
               document.getElementById("form").reset();
@@ -52,7 +55,7 @@ export default props => {
             .catch(e =>
               setText(
                 <Text textAlign="center" p="10px" fontWeight="bold" color="red">
-                  Username Taken!
+                  Username Taken, or Captcha not Filled out!
                 </Text>
               )
             );
@@ -103,6 +106,14 @@ export default props => {
             ml="10px"
             required
           />
+        </Flex>
+        <Flex py="20px">
+          <Flex mx="auto">
+            <Captcha
+              ref={captcha}
+              sitekey="6LcvzOYUAAAAAOuU-30rjhvgKl3dtzM1iRcF2uZW"
+            />
+          </Flex>
         </Flex>
         <Flex py="20px">
           <Button m="auto" variant="3D" bg="accent">

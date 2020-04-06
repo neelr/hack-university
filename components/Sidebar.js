@@ -26,10 +26,12 @@ export default props => {
                     (document.getElementById("sidebar").style.width = "300px")
                 }
                 sx={{
+                    bg: "primary",
+                    color: "white",
                     display: props.hidden ? "none" : null,
                     left: 0,
                     top: "50px",
-                    m: "10px",
+                    p: "10px",
                     position: "absolute",
                     ":hover": { color: "grey", cursor: "pointer" }
                 }}
@@ -40,7 +42,7 @@ export default props => {
                 id="sidebar"
                 sx={{
                     width: "0px",
-                    bg: "secondary",
+                    bg: "primary",
                     transition: "all 0.5s",
                     overflow: "hidden",
                     height: "100vh",

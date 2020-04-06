@@ -1,8 +1,9 @@
 import { useRouter } from "next/router";
-import { Flex } from "rebass";
+import { Flex, Heading } from "rebass";
 import classPages from "../../components/classPages"
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Cookie from "js-cookie"
 
 let Classes = props => {
     const router = useRouter();
@@ -11,6 +12,8 @@ let Classes = props => {
     let Page = (props) => {
         if (props.page) {
             return classPages[props.page](props.id)
+        } else if (props.login) {
+            return <Heading p="30px" fontSize={[4, 5, 6]}>Please Register or Log In to Enroll!</Heading>
         } else {
             return <br />
         }
@@ -28,7 +31,11 @@ let Classes = props => {
                 } else if (!(d.data["Leading Classes"] ? d.data["Leading Classes"].includes(router.query.id[0]) : false)) {
                     setPageProps({ id: router.query.id, page: router.query.id.length == 1 ? "indexEnroll" : `${router.query.id[1]}Enroll` })
                 }
-            }).catch(e => window.location.href = "/register")
+            }).catch(e => {
+                setPageProps({ login: true })
+                Cookie.remove('loginToken')
+                setTimeout(() => (window.location.href = "/login"), 1000);
+            })
     }, [])
     return (
         <Flex width="100vw">

@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from 'theme-ui'
 import React, { useEffect, useState, useReducer } from "react";
-import { Flex, Heading, Image, Text, Button, Link as A } from "rebass";
+import { Flex, Heading, Image as I, Text, Button, Link as A } from "rebass";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import { X } from "react-feather"
@@ -31,12 +31,15 @@ const NavLink = ({ sx, ...props }) => (
     </Link>
 )
 const Index = ({ sx, ...props }) => {
+    const [teacher, setTeacher] = useState(null);
     const [resp, setResp] = useState(null);
     useEffect(() => {
         axios
             .get(`/api/classes/${props.id}`)
             .then(r => {
                 setResp(r.data);
+                axios.get(`/api/users/${r.data.Leader[0]}`)
+                    .then(e => setTeacher(e.data.Username))
             })
             .catch(() => console.log(props.id));
     }, []);
@@ -45,7 +48,8 @@ const Index = ({ sx, ...props }) => {
             <Heading mx="auto" my="20px">
                 {resp ? resp["Class Name"] : null}
             </Heading>
-            <Image
+            <Text sx={{ mx: "auto", my: "10px", }}>Teacher: <A href={`/users/${resp ? resp.Leader[0] : ""}`} sx={{ color: "link", textDecorationStyle: "wavy" }}>{`@${teacher}`}</A></Text>
+            <I
                 src={resp ? resp["Class Image"][0].url : null}
                 sx={{
                     width: ["90vw", "30vw", null, "30vw"],
@@ -113,7 +117,7 @@ const IndexEnroll = ({ sx, ...props }) => {
                 {resp ? resp["Class Name"] : null}
             </Heading>
             <Text sx={{ mx: "auto", my: "10px", }}>Teacher: <A href={`/users/${resp ? resp.Leader[0] : ""}`} sx={{ color: "link", textDecorationStyle: "wavy" }}>{`@${teacher}`}</A></Text>
-            <Image
+            <I
                 src={resp ? resp["Class Image"][0].url : null}
                 sx={{
                     width: ["90vw", "30vw", null, "30vw"],
@@ -136,6 +140,19 @@ const IndexEnroll = ({ sx, ...props }) => {
 };
 
 const IndexAdmin = props => {
+    const ValidateImg = (file, done) => {
+        let img = new Image()
+        img.src = window.URL.createObjectURL(file)
+        img.onload = () => {
+            if ((img.height / img.width) <= 0.7) {
+                done(true)
+            } else {
+                alert("Max image ratio is 7:10");
+                return false;
+            }
+
+        }
+    }
     const [resp, setResp] = useState(null);
     const [text, setText] = useState(null);
     useEffect(() => {
@@ -163,20 +180,28 @@ const IndexAdmin = props => {
                 let image = document.getElementById("image")
                 let url;
                 if (image.files.length > 0) {
-                    let form = new FormData();
-                    form.append("file", image.files[0]);
-                    url = await axios({
-                        method: "post",
-                        url: "https://cors-anywhere.herokuapp.com/uguu.se/api.php?d=upload-tool",
-                        data: form,
-                        headers: { "Content-Type": "multipart/form-data" }
+                    ValidateImg(image.files[0], async () => {
+                        let form = new FormData();
+                        form.append("file", image.files[0]);
+                        url = await axios({
+                            method: "post",
+                            url: "https://cors-anywhere.herokuapp.com/uguu.se/api.php?d=upload-tool",
+                            data: form,
+                            headers: { "Content-Type": "multipart/form-data" }
+                        })
+                        payload["Class Image"] = [{ url: url.data }]
+                        axios.post(`/api/classes/update/${props.id}`, payload)
+                            .then(d => {
+                                setText(<Text m="auto" color="green">Done!</Text>)
+                                document.getElementById("image").value = null
+                            })
                     })
-                    payload["Class Image"] = [{ url: url.data }]
+                } else {
+                    axios.post(`/api/classes/update/${props.id}`, payload)
+                        .then(d => {
+                            setText(<Text m="auto" color="green">Done!</Text>)
+                        })
                 }
-                axios.post(`/api/classes/update/${props.id}`, payload)
-                    .then(d => {
-                        setText(<Text m="auto" color="green">Done!</Text>)
-                    })
             }}>
                 <Flex m="auto" flexDirection="column">
                     {text}
@@ -256,6 +281,7 @@ const SectionsEnroll = (props) => {
         axios
             .get(`/api/classes/${props.id[0]}`)
             .then(r => {
+                r.data.Sections ? null : r.data.Sections = "[]"
                 setResp(r.data);
             })
             .catch(() => console.log(props.id));
@@ -263,10 +289,13 @@ const SectionsEnroll = (props) => {
     return (
         <Flex flexDirection="column" width="100vw">
             <Sidebar id={props.id[0]} />
+            <Heading m="auto" fontSize={[3, 4, 5]}>
+                Sections
+			</Heading>
             {resp ? JSON.parse(resp.Sections).map(v => (
                 <Box sx={{ display: "flex" }} mx="auto" width={["90vw", "50vw", null, "50vw"]} >
                     <Heading fontSize={[3, 4, 5]} m="auto">{v.name}</Heading>
-                    <Flex flexDirection="column" width={["90vw", "50vw", null, "50vw"]} m="auto" dangerouslySetInnerHTML={{ __html: DOM.sanitize(marked(v.text)) }}>
+                    <Flex flexDirection="column" width={["90vw", "50vw", null, "50vw"]} p="30px" m="auto" dangerouslySetInnerHTML={{ __html: DOM.sanitize(marked(v.text)) }}>
                     </Flex>
                     <hr sx={{ mx: "30vw" }} />
                 </Box>
@@ -362,6 +391,7 @@ const FilesEnrolled = (props) => {
         axios
             .get(`/api/classes/${props.id[0]}`)
             .then(r => {
+                r.data.Files ? null : r.data.Files = []
                 setResp(r.data);
                 console.log("hi")
             })
@@ -457,7 +487,7 @@ const Students = (props) => {
             .then(async r => {
                 let names = r.data.Students.map(async d => {
                     let name = await axios.get(`/api/users/${d}`)
-                    return <A href={`/users/${d}`} sx={{ color: "link", borderRadius: "10px", textDecorationStyle: "wavy" }} mx="auto" my="10px" p="10px" bg="secondary">{name.data.Username}</A>
+                    return <A href={`/users/${d}`} sx={{ color: "link", borderRadius: "10px", textDecorationStyle: "wavy" }} mx="auto" my="10px" p="10px" bg="#AC2901">{name.data.Username}</A>
                 })
                 names = await Promise.all(names)
                 setResp(names)
