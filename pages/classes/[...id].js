@@ -32,9 +32,7 @@ let Classes = props => {
                     setPageProps({ id: router.query.id, page: router.query.id.length == 1 ? "indexEnroll" : `${router.query.id[1]}Enroll` })
                 }
             }).catch(e => {
-                setPageProps({ login: true })
-                Cookie.remove('loginToken')
-                setTimeout(() => (window.location.href = "/login"), 1000);
+                setPageProps({ id: router.query.id, page: "index" })
             })
     }, [])
     return (

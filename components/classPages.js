@@ -77,8 +77,7 @@ const Index = ({ sx, ...props }) => {
                                 window.location.href = "/classes";
                             })
                             .catch(e => {
-                                console.log(e);
-                                //window.location.href = "/register"
+                                window.location.href = "/login"
                             });
                     }}
                     mx="auto"
