@@ -64,8 +64,9 @@ const Index = ({ sx, ...props }) => {
                     p: "15px",
                     textIndent: "20px"
                 }}
+                dangerouslySetInnerHTML={{ __html: DOM.sanitize(marked(resp ? resp.Description : "")) }}
             >
-                {resp ? resp.Description : null}
+
             </Text>
             {resp ? (
                 <Button

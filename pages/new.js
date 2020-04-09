@@ -87,6 +87,7 @@ export default props => {
             sx={{ borderRadius: "10px" }}
             width="70%"
             m="auto"
+            placeholder="Markdown"
             required
           />
         </Flex>
