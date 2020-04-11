@@ -322,6 +322,29 @@ server.prepare().then(() => {
             res.send(clean)
         }).catch(r => res.sendStatus(401))
     })
+    app.post("/api/users/update", (req, res) => {
+        base("Users")
+            .select({
+                view: "Main",
+                maxRecords: 3,
+                filterByFormula: `{LoginToken} = '${req.cookies.loginToken}'`
+            })
+            .eachPage(records => {
+                let record = records[0]
+                if (!record)
+                    return res.sendStatus(401)
+                if (req.body.pass == record.fields.Password && record.fields.Verified) {
+                    base("Users").update([{
+                        id: record.id,
+                        fields: {
+                            ...req.body.fields
+                        }
+                    }]).then(d => res.sendStatus(200)).catch(e => console.log(e))
+                } else {
+                    res.sendStatus(401)
+                }
+            }).catch(r => res.sendStatus(401))
+    })
     //NEXTJS ROUTES
     app.get("/*", handle);
 

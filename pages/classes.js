@@ -77,13 +77,14 @@ const Index = props => {
     return (
         <Flex flexDirection="column" width="100vw">
             <Flex p="10px">
-                <NavLink href="/new" ml="auto">+ New Class</NavLink>
+                <NavLink href="/settings" mr="auto">Change Password</NavLink>
+                <NavLink href="/new">+ New Class</NavLink>
             </Flex>
             <Flex p="30px" flex="1" flexDirection="column">
                 <Flex flexDirection="column">
                     <Heading m="auto" fontSize={[4, 5, 6]}>
                         Your Classes
-        </Heading>
+                    </Heading>
                     {login ? null : (
                         <Heading color="red" m="auto" fontSize={[2, 3, 4]}>
                             Not Logged In!

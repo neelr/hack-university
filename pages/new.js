@@ -21,7 +21,7 @@ export default props => {
     }
   }
   return (
-    <Flex p="30px" width="100vw" flexDirection="column">
+    <Flex width="100vw" flexDirection="column">
       <Heading m="auto" fontSize={[4, 5, 6]}>
         Register
       </Heading>
