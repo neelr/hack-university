@@ -71,7 +71,7 @@ const Index = props => {
             .catch(() => {
                 Cookie.remove('loginToken', { path: '' })
                 setLogin(false);
-                setTimeout(() => (window.location.href = "/login"), 1000);
+                setTimeout(() => (window.location.href = "/login?err=You need an account to have classes!"), 1000);
             });
     }, []);
     return (

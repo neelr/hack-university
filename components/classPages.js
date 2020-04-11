@@ -77,7 +77,7 @@ const Index = ({ sx, ...props }) => {
                                 window.location.href = "/classes";
                             })
                             .catch(e => {
-                                window.location.href = "/login"
+                                window.location.href = "/login?err=You need to Sign in/Register and try again!"
                             });
                     }}
                     mx="auto"
