@@ -65,6 +65,7 @@ export default props => {
                 <Tabs href={`/classes/${props.id}/sections`}>Sections</Tabs>
                 <Tabs href={`/classes/${props.id}/files`}>Files</Tabs>
                 <Tabs href={`/classes/${props.id}/students`}>Students</Tabs>
+                {props.admin ? <Tabs href={`/classes/${props.id}/mail`}>Send Mail!</Tabs> : null}
             </Flex>
         </Flex>
     );

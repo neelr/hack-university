@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from 'theme-ui'
-import React, { useEffect, useState, useReducer } from "react";
+import React, { useEffect, useState, useReducer, useRef } from "react";
 import { Flex, Heading, Image as I, Text, Button, Link as A } from "rebass";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
@@ -10,6 +10,8 @@ import { Input, Textarea } from "@rebass/forms";
 import marked from "marked"
 import DOM from "dompurify"
 import Link from "next/link"
+import Head from "next/head"
+import Captcha from "react-google-recaptcha"
 
 const NavLink = ({ sx, ...props }) => (
     <Link href={props.href}>
@@ -45,6 +47,9 @@ const Index = ({ sx, ...props }) => {
     }, []);
     return (
         <Flex width="100vw" flexDirection="column" pt="20px">
+            <Head>
+                <meta name="og:image" content={resp ? resp["Class Image"][0].url : null} />
+            </Head>
             <Heading mx="auto" my="20px">
                 {resp ? resp["Class Name"] : null}
             </Heading>
@@ -422,7 +427,7 @@ const FilesAdmin = (props) => {
     }, []);
     return (
         <Flex width="100vw" flexDirection="column">
-            <Sidebar id={props.id[0]} />
+            <Sidebar id={props.id[0]} admin />
             <Heading m="auto" fontSize={[4, 5, 6]}>Files</Heading>
             {text}
             {resp.Files ? resp.Files.map((v, i) => {
@@ -502,6 +507,104 @@ const Students = (props) => {
         </Flex>
     )
 }
+const StudentsAdmin = (props) => {
+    const [resp, setResp] = useState(null);
+    useEffect(() => {
+        axios
+            .get(`/api/classes/${props.id[0]}`)
+            .then(async r => {
+                let names = r.data.Students.map(async d => {
+                    let name = await axios.get(`/api/users/${d}`)
+                    return <A href={`/users/${d}`} sx={{ color: "link", borderRadius: "10px", textDecorationStyle: "wavy" }} mx="auto" my="10px" p="10px" bg="#AC2901">{name.data.Username}</A>
+                })
+                names = await Promise.all(names)
+                setResp(names)
+            })
+            .catch(e => console.log(e));
+    }, []);
+    return (
+        <Flex flexDirection="column" width="100vw">
+            <Sidebar id={props.id[0]} admin />
+            <Heading mx="auto" fontSize={[3, 4, 5]}>Students!</Heading>
+            {resp}
+        </Flex>
+    )
+}
+
+const Mail = (props) => {
+    let [text, setText] = useState(null)
+    let captcha = useRef()
+    return (
+        <Flex flexDirection="column" width="100vw">
+            <Sidebar id={props.id[0]} admin />
+            <Heading m="auto" fontSize={[4, 5, 6]}>
+                Send Mail!
+            </Heading>
+            <Box
+                id="form"
+                as="form"
+                mx="auto"
+                my="15px"
+                sx={{ p: "10px", py: "30px" }}
+                width={["90vw", "50vw", "50vw", "50vw"]}
+                onSubmit={e => {
+                    e.preventDefault()
+                    setText(<Text mx="auto" textAlign="center" color="yellow" fontWeight="700">Sending...</Text>)
+                    axios.post(`/api/classes/mail/${props.id[0]}`, {
+                        subject: document.getElementById("subject").value,
+                        captcha: captcha.current.getValue(),
+                        html: document.getElementById("body").value
+                    }).then(d => {
+                        setText(<Text mx="auto" textAlign="center" color="green" fontWeight="700">Sent!</Text>)
+                    }).catch(d => {
+                        setText(<Text mx="auto" textAlign="center" color="red" fontWeight="700">Fill out the Captcha!</Text>)
+                    })
+                }}
+            >
+                {text}
+                <Flex m="auto" flexDirection="column">
+                    <Text fontWeight="bold" m="auto">
+                        Subject:
+                    </Text>
+                    <Input
+                        sx={{ borderRadius: "10px" }}
+                        width="70%"
+                        m="auto"
+                        id="subject"
+                        required
+                    />
+                </Flex>
+                <Flex m="auto" my="20px" flexDirection="column">
+                    <Text fontWeight="bold" m="auto">
+                        Body:
+                    </Text>
+                    <Textarea
+                        id="body"
+                        sx={{ borderRadius: "10px" }}
+                        width="70%"
+                        m="auto"
+                        placeholder="Markdown"
+                        required
+                    />
+                </Flex>
+                <Flex py="20px">
+                    <Flex mx="auto">
+                        <Captcha
+                            ref={captcha}
+                            sitekey="6LcvzOYUAAAAAOuU-30rjhvgKl3dtzM1iRcF2uZW"
+                        />
+                    </Flex>
+                </Flex>
+                <Flex py="20px">
+                    <Button m="auto" variant="3D" bg="accent">
+                        Send!
+                    </Button>
+                </Flex>
+            </Box>
+        </Flex>
+    )
+}
+
 export default {
     index: id => <Index id={id} />,
     indexEnroll: id => <IndexEnroll id={id} />,
@@ -511,5 +614,6 @@ export default {
     filesEnroll: id => <FilesEnrolled id={id} />,
     filesAdmin: id => <FilesAdmin id={id} />,
     studentsEnroll: id => <Students id={id} />,
-    studentsAdmin: id => <Students id={id} />
+    studentsAdmin: id => <StudentsAdmin id={id} />,
+    mailAdmin: id => <Mail id={id} />
 };
