@@ -41,13 +41,14 @@ export default props => {
             <Flex
                 id="sidebar"
                 sx={{
-                    width: "0px",
+                    width: ["0px", null, null, "300px"],
                     bg: "primary",
                     transition: "all 0.5s",
                     overflow: "hidden",
                     height: "100vh",
                     position: "fixed",
                     left: 0,
+                    top: "50px",
                     flexDirection: "column",
                     color: "white"
                 }}
