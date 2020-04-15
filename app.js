@@ -251,7 +251,7 @@ server.prepare().then(() => {
                             Promise.all(emails).then(allEmails => {
                                 transporter.sendMail({
                                     from: `"Hack University" hackuniversity@outlook.com`,
-                                    to: allEmails,
+                                    bcc: allEmails,
                                     subject: `${record.fields["Class Name"]} - ${req.body.subject}`,
                                     html: `
                         <!doctype html>
