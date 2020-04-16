@@ -67,12 +67,13 @@ const Index = ({ sx, ...props }) => {
                     mx: "auto",
                     width: ["90vw", "50vw", null, "50vw"],
                     p: "15px",
-                    textIndent: "20px"
+                    textIndent: "20px",
+                    a: {
+                        textDecorationStyle: "wavy", color: "link", ":hover": { "color": "secondary" }
+                    }
                 }}
                 dangerouslySetInnerHTML={{ __html: DOM.sanitize(marked(resp ? resp.Description : "")) }}
-            >
-
-            </Text>
+            />
             {resp ? (
                 <Button
                     onClick={() => {
@@ -135,7 +136,10 @@ const IndexEnroll = ({ sx, ...props }) => {
                     mx: "auto",
                     width: ["90vw", "50vw", null, "50vw"],
                     p: "15px",
-                    textIndent: "20px"
+                    textIndent: "20px",
+                    a: {
+                        textDecorationStyle: "wavy", color: "link", ":hover": { "color": "secondary" }
+                    }
                 }}
                 dangerouslySetInnerHTML={{ __html: DOM.sanitize(marked(resp ? resp.Description : "")) }}
             >
