@@ -611,6 +611,8 @@ const Mail = (props) => {
 }
 const Posts = (props) => {
     let [resp, setResp] = useState(null)
+    let [text, setText] = useState(null)
+    let captcha = useRef()
     useEffect(() => {
         axios
             .get(`/api/classes/${props.id[0]}/post`)
@@ -657,36 +659,48 @@ const Posts = (props) => {
                     e.preventDefault()
                     axios.post(`/api/classes/${props.id[0]}/post`, {
                         body: document.getElementById("body").value,
-                        title: document.getElementById("title").value
+                        title: document.getElementById("title").value,
+                        captcha: captcha.current.getValue()
                     })
                         .then(d => {
                             location.reload()
+                        })
+                        .catch(d => {
+                            setText("You must fill out the Captcha!")
                         })
                 }}>
                     <Flex my="20px" flexDirection="column">
                         <Text fontWeight="bold" m="auto">
                             Make a Post!
 					    </Text>
+                        <Text color="red" mx="auto">{text}</Text>
                         <Input
                             sx={{ borderRadius: "10px", width: "100%", mb: "10px" }}
                             id="title"
                             placeholder="Title"
+                            required
                         />
                         <Textarea
                             id="body"
                             placeholder="Body Mardown"
                             sx={{ borderRadius: "10px", width: "100%", height: "200px", m: "auto" }}
                             defaultValue={resp ? resp["Description"] : null}
+                            required
                         />
+                        <Flex m="auto" mt="20px">
+                            <Captcha ref={captcha} sitekey="6LcvzOYUAAAAAOuU-30rjhvgKl3dtzM1iRcF2uZW" />
+                        </Flex>
                     </Flex>
                     <Button sx={{ ":hover": { cursor: "pointer" } }}>Submit!</Button>
                 </Flex>
             </Flex>
-        </Flex>
+        </Flex >
     )
 }
 const Post = (props) => {
+    let [text, setText] = useState(null)
     let [resp, setResp] = useState(null)
+    let captcha = useRef()
     useEffect(() => {
         axios
             .get(`/api/classes/${props.id[0]}/post`)
@@ -735,20 +749,26 @@ const Post = (props) => {
                 )) : null}
                 <Flex flexDirection="column" mb="30px" as="form" onSubmit={e => {
                     e.preventDefault()
-                    axios.post(`/api/classes/${props.id[0]}/post/${props.id[2]}`, { body: document.getElementById("body").value })
+                    axios.post(`/api/classes/${props.id[0]}/post/${props.id[2]}`, { body: document.getElementById("body").value, captcha: captcha.current.getValue() })
                         .then(d => {
                             location.reload()
                         })
+                        .catch(d => setText("You need to fill out the Captcha!"))
                 }}>
                     <Flex my="20px" flexDirection="column">
                         <Text fontWeight="bold" m="auto">
                             Make a Comment!
 					    </Text>
+                        <Text color="red" mx="auto">{text}</Text>
                         <Textarea
                             id="body"
                             sx={{ borderRadius: "10px", width: "100%", height: "200px" }}
                             defaultValue={resp ? resp["Description"] : null}
+                            required
                         />
+                        <Flex m="auto" mt="20px">
+                            <Captcha ref={captcha} sitekey="6LcvzOYUAAAAAOuU-30rjhvgKl3dtzM1iRcF2uZW" />
+                        </Flex>
                     </Flex>
                     <Button sx={{ ":hover": { cursor: "pointer" } }}>Submit!</Button>
                 </Flex>
