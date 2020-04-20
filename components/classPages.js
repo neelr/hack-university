@@ -622,7 +622,7 @@ const Posts = (props) => {
     }, []);
     return (
         <Flex flexDirection="column" width="100vw">
-            <Sidebar id={props.id[0]} />
+            <Sidebar id={props.id[0]} admin={props.admin} />
             <Heading m="auto" fontSize={[4, 5, 6]} pt="30px">
                 Posts
             </Heading>
@@ -705,7 +705,7 @@ const Post = (props) => {
                 textDecorationStyle: "wavy", color: "link", ":hover": { "color": "secondary" }
             }
         }}>
-            < Sidebar id={props.id[0]} />
+            < Sidebar id={props.id[0]} admin={props.admin} />
             <Heading m="auto" fontSize={[4, 5, 6]} pt="30px">
                 {resp ? resp.title : null}
             </Heading>
