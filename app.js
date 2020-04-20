@@ -629,7 +629,7 @@ server.prepare().then(() => {
                     .eachPage((records, next) => {
                         records.forEach(record => {
                             if (record.id == req.params.id) {
-                                res.send(JSON.parse(record.get("Posts")))
+                                res.send(JSON.parse(record.get("Posts") == "" ? "[]" : record.get("Posts")))
                             }
                         })
                         next()
