@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser")
 const next = require("next")
 const nodemailer = require("nodemailer")
 const Airtable = require("airtable")
+const { v4 } = require("uuid")
 const axios = require("axios")
 const rateLimit = require("express-rate-limit");
 const qs = require("querystring")
@@ -109,7 +110,7 @@ server.prepare().then(() => {
             records.forEach(record => {
                 if (record.get("Verified")) {
                     res.cookie("loginToken", loginToken)
-                    res.cookie("user", username)
+                    res.cookie("user", record.id)
                     base("Users").update([{
                         id: record.id,
                         fields: {
@@ -448,6 +449,179 @@ server.prepare().then(() => {
                         "Enrolled Classes": classes.filter(v => v !== req.params.id)
                     }
                 }]).then(e => res.sendStatus(200)).catch(e => res.sendStatus(404))
+            }).catch(e => res.sendStatus(401))
+    })
+    app.post("/api/classes/:id/post", (req, res) => {
+        base("Users")
+            .select({
+                view: "Main",
+                maxRecords: 3,
+                filterByFormula: `{LoginToken} = '${req.cookies.loginToken}'`
+            })
+            .eachPage(records => {
+                let user = records[0]
+                if (!user)
+                    return res.sendStatus(401)
+                if (!user.get("Verified"))
+                    return res.sendStatus(401)
+                base("Classes")
+                    .select({ view: "Main" })
+                    .eachPage((records, next) => {
+                        records.forEach(record => {
+                            if (record.id == req.params.id) {
+                                posts = JSON.parse(record.get("Posts"))
+                                posts.push({
+                                    id: v4(),
+                                    body: req.body.body,
+                                    title: req.body.title,
+                                    user: user.id,
+                                    name: user.get("Username"),
+                                    comments: []
+                                })
+                                base("Classes").update([{ id: record.id, fields: { Posts: JSON.stringify(posts) } }])
+                                res.sendStatus(200)
+                            }
+                        })
+                        next()
+                    })
+            }).catch(e => res.sendStatus(401))
+    })
+    app.delete("/api/classes/:id/post/:postId", (req, res) => {
+        base("Users")
+            .select({
+                view: "Main",
+                maxRecords: 3,
+                filterByFormula: `{LoginToken} = '${req.cookies.loginToken}'`
+            })
+            .eachPage(records => {
+                let user = records[0]
+                if (!user)
+                    return res.sendStatus(401)
+                if (!user.get("Verified"))
+                    return res.sendStatus(401)
+                base("Classes")
+                    .select({ view: "Main" })
+                    .eachPage((records, next) => {
+                        records.forEach(record => {
+                            if (record.id == req.params.id) {
+                                posts = JSON.parse(record.get("Posts"))
+                                posts.map((d, i) => {
+                                    if (d.id == req.params.postId) {
+                                        if ((d.user == user.id) || (user.id == record.get("Leader")[0])) {
+                                            posts.splice(i, 1)
+                                            base("Classes").update([{ id: record.id, fields: { Posts: JSON.stringify(posts) } }])
+                                            res.sendStatus(200)
+                                        } else {
+                                            res.sendStatus(401)
+                                        }
+                                    }
+                                })
+                            }
+                        })
+                        next()
+                    })
+            }).catch(e => res.sendStatus(401))
+    })
+    app.delete("/api/classes/:id/post/:postId/:commentId", (req, res) => {
+        base("Users")
+            .select({
+                view: "Main",
+                maxRecords: 3,
+                filterByFormula: `{LoginToken} = '${req.cookies.loginToken}'`
+            })
+            .eachPage(records => {
+                let user = records[0]
+                if (!user)
+                    return res.sendStatus(401)
+                if (!user.get("Verified"))
+                    return res.sendStatus(401)
+                base("Classes")
+                    .select({ view: "Main" })
+                    .eachPage((records, next) => {
+                        records.forEach(record => {
+                            if (record.id == req.params.id) {
+                                posts = JSON.parse(record.get("Posts"))
+                                posts.map((d, s) => {
+                                    if (d.id == req.params.postId) {
+                                        d.comments.map((d, i) => {
+                                            if (d.id == req.params.commentId) {
+                                                if ((d.user == user.id) || (user.id == record.get("Leader")[0])) {
+                                                    posts[s].comments.splice(i, 1)
+                                                    base("Classes").update([{ id: record.id, fields: { Posts: JSON.stringify(posts) } }])
+                                                    res.sendStatus(200)
+                                                } else {
+                                                    res.sendStatus(401)
+                                                }
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                        next()
+                    })
+            }).catch(e => res.sendStatus(401))
+    })
+    app.post("/api/classes/:id/post/:postId", (req, res) => {
+        base("Users")
+            .select({
+                view: "Main",
+                maxRecords: 3,
+                filterByFormula: `{LoginToken} = '${req.cookies.loginToken}'`
+            })
+            .eachPage(records => {
+                let user = records[0]
+                if (!user)
+                    return res.sendStatus(401)
+                if (!user.get("Verified"))
+                    return res.sendStatus(401)
+                base("Classes")
+                    .select({ view: "Main" })
+                    .eachPage((records, next) => {
+                        records.forEach(record => {
+                            if (record.id == req.params.id) {
+                                posts = JSON.parse(record.get("Posts"))
+                                posts.map(v => {
+                                    if (v.id == req.params.postId) {
+                                        v.comments.push({
+                                            body: req.body.body,
+                                            user: user.id,
+                                            id: v4(),
+                                            name: user.get("Username")
+                                        })
+                                    }
+                                })
+                                base("Classes").update([{ id: record.id, fields: { Posts: JSON.stringify(posts) } }])
+                                res.sendStatus(200)
+                            }
+                        })
+                        next()
+                    })
+            }).catch(e => res.sendStatus(401))
+    })
+    app.get("/api/classes/:id/post", (req, res) => {
+        base("Users")
+            .select({
+                view: "Main",
+                maxRecords: 3,
+                filterByFormula: `{LoginToken} = '${req.cookies.loginToken}'`
+            })
+            .eachPage(records => {
+                let user = records[0]
+                if (!user)
+                    return res.sendStatus(401)
+                if (!user.get("Verified"))
+                    return res.sendStatus(401)
+                base("Classes")
+                    .select({ view: "Main" })
+                    .eachPage((records, next) => {
+                        records.forEach(record => {
+                            if (record.id == req.params.id) {
+                                res.send(JSON.parse(record.get("Posts")))
+                            }
+                        })
+                        next()
+                    })
             }).catch(e => res.sendStatus(401))
     })
     app.get("/api/classes/:id", (req, res) => {

@@ -12,6 +12,7 @@ import DOM from "dompurify"
 import Link from "next/link"
 import Head from "next/head"
 import Captcha from "react-google-recaptcha"
+import Cookie from "js-cookie";
 
 const NavLink = ({ sx, ...props }) => (
     <Link href={props.href}>
@@ -608,7 +609,153 @@ const Mail = (props) => {
         </Flex>
     )
 }
-
+const Posts = (props) => {
+    let [resp, setResp] = useState(null)
+    useEffect(() => {
+        axios
+            .get(`/api/classes/${props.id[0]}/post`)
+            .then(r => {
+                setResp(r.data);
+                console.log("hi")
+            })
+            .catch(e => console.log(e));
+    }, []);
+    return (
+        <Flex flexDirection="column" width="100vw">
+            <Sidebar id={props.id[0]} />
+            <Heading m="auto" fontSize={[4, 5, 6]} pt="30px">
+                Posts
+            </Heading>
+            <Flex mx="auto" flexDirection="column" width={["90vw", "50vw", "50vw", "50vw"]} sx={{
+                a: {
+                    textDecorationStyle: "wavy", color: "link", ":hover": { "color": "secondary" }
+                }
+            }}>
+                {resp ? resp.map(v => (
+                    <div style={{ display: "block" }}>
+                        <Flex>
+                            <Flex ml="auto">
+                                {(v.user == Cookie.get("user")) || props.admin ?
+                                    (
+                                        <Flex onClick={() => {
+                                            axios.delete(`/api/classes/${props.id[0]}/post/${v.id}`)
+                                                .then(d => location.reload())
+                                        }} m="10px" ml="auto" p="3px" sx={{ borderRadius: "30px", transition: "all 0.2s", ":hover": { color: "red", cursor: "pointer", border: "1px solid red" } }}>
+                                            <X size={24} />
+                                        </Flex>
+                                    )
+                                    : null}
+                            </Flex>
+                        </Flex>
+                        <a href={`/classes/${props.id[0]}/post/${v.id}`}><Heading>{v.title}</Heading></a>
+                        <a sx={{ textDecoration: "none" }} href={`/users/${v.user}`}>{`@${v.name}`}</a>
+                        <Text color="grey" dangerouslySetInnerHTML={{ __html: DOM.sanitize(marked(v.body)) }} />
+                        <hr />
+                    </div>
+                )) : null}
+                <Flex flexDirection="column" as="form" mb="30px" onSubmit={e => {
+                    e.preventDefault()
+                    axios.post(`/api/classes/${props.id[0]}/post`, {
+                        body: document.getElementById("body").value,
+                        title: document.getElementById("title").value
+                    })
+                        .then(d => {
+                            location.reload()
+                        })
+                }}>
+                    <Flex my="20px" flexDirection="column">
+                        <Text fontWeight="bold" m="auto">
+                            Make a Post!
+					    </Text>
+                        <Input
+                            sx={{ borderRadius: "10px", width: "100%", mb: "10px" }}
+                            id="title"
+                            placeholder="Title"
+                        />
+                        <Textarea
+                            id="body"
+                            placeholder="Body Mardown"
+                            sx={{ borderRadius: "10px", width: "100%", height: "200px", m: "auto" }}
+                            defaultValue={resp ? resp["Description"] : null}
+                        />
+                    </Flex>
+                    <Button sx={{ ":hover": { cursor: "pointer" } }}>Submit!</Button>
+                </Flex>
+            </Flex>
+        </Flex>
+    )
+}
+const Post = (props) => {
+    let [resp, setResp] = useState(null)
+    useEffect(() => {
+        axios
+            .get(`/api/classes/${props.id[0]}/post`)
+            .then(r => {
+                r.data.map(v => {
+                    if (v.id == props.id[2]) {
+                        setResp(v)
+                    }
+                })
+            })
+            .catch(e => console.log(e));
+    }, []);
+    return (
+        <Flex flexDirection="column" width={["90vw", "50vw", "50vw", "50vw"]} mx="auto" sx={{
+            a: {
+                textDecorationStyle: "wavy", color: "link", ":hover": { "color": "secondary" }
+            }
+        }}>
+            < Sidebar id={props.id[0]} />
+            <Heading m="auto" fontSize={[4, 5, 6]} pt="30px">
+                {resp ? resp.title : null}
+            </Heading>
+            <a sx={{ textDecoration: "none" }} href={`/users/${resp ? resp.user : null}`}>{`@${resp ? resp.name : null}`}</a>
+            <Text dangerouslySetInnerHTML={{ __html: DOM.sanitize(marked(resp ? resp.body : "")) }}></Text>
+            <Flex flexDirection="column">
+                <Heading m="10px">Comments</Heading>
+                {resp ? resp.comments.map(v => (
+                    <div style={{ display: "block", border: "1px solid grey", padding: "10px" }}>
+                        <Flex>
+                            <Flex ml="auto">
+                                {(v.user == Cookie.get("user")) || props.admin ?
+                                    (
+                                        <Flex onClick={() => {
+                                            axios.delete(`/api/classes/${props.id[0]}/post/${props.id[2]}/${v.id}`)
+                                                .then(d => location.reload())
+                                        }} m="10px" ml="auto" p="3px" sx={{ borderRadius: "30px", transition: "all 0.2s", ":hover": { color: "red", cursor: "pointer", border: "1px solid red" } }}>
+                                            <X size={24} />
+                                        </Flex>
+                                    )
+                                    : null}
+                            </Flex>
+                        </Flex>
+                        <a sx={{ textDecoration: "none" }} href={`/users/${v.user}`}>{`@${v.name}`}</a>
+                        <Text color="grey" dangerouslySetInnerHTML={{ __html: DOM.sanitize(marked(v.body)) }} />
+                    </div>
+                )) : null}
+                <Flex flexDirection="column" mb="30px" as="form" onSubmit={e => {
+                    e.preventDefault()
+                    axios.post(`/api/classes/${props.id[0]}/post/${props.id[2]}`, { body: document.getElementById("body").value })
+                        .then(d => {
+                            location.reload()
+                        })
+                }}>
+                    <Flex my="20px" flexDirection="column">
+                        <Text fontWeight="bold" m="auto">
+                            Make a Comment!
+					    </Text>
+                        <Textarea
+                            id="body"
+                            sx={{ borderRadius: "10px", width: "100%", height: "200px" }}
+                            defaultValue={resp ? resp["Description"] : null}
+                        />
+                    </Flex>
+                    <Button sx={{ ":hover": { cursor: "pointer" } }}>Submit!</Button>
+                </Flex>
+            </Flex>
+        </Flex >
+    )
+}
 export default {
     index: id => <Index id={id} />,
     indexEnroll: id => <IndexEnroll id={id} />,
@@ -619,5 +766,9 @@ export default {
     filesAdmin: id => <FilesAdmin id={id} />,
     studentsEnroll: id => <Students id={id} />,
     studentsAdmin: id => <StudentsAdmin id={id} />,
-    mailAdmin: id => <Mail id={id} />
+    mailAdmin: id => <Mail id={id} />,
+    postsEnroll: id => <Posts id={id} />,
+    postsAdmin: id => <Posts id={id} admin />,
+    postEnroll: id => <Post id={id} />,
+    postAdmin: id => <Post id={id} admin />
 };

@@ -32,7 +32,7 @@ export default props => {
                     left: 0,
                     top: "50px",
                     p: "10px",
-                    position: "absolute",
+                    position: "fixed",
                     ":hover": { color: "grey", cursor: "pointer" }
                 }}
             >
@@ -65,6 +65,7 @@ export default props => {
                 <Tabs href={`/classes/${props.id}/sections`}>Sections</Tabs>
                 <Tabs href={`/classes/${props.id}/files`}>Files</Tabs>
                 <Tabs href={`/classes/${props.id}/students`}>Students</Tabs>
+                <Tabs href={`/classes/${props.id}/posts`}>Forum</Tabs>
                 {props.admin ? <Tabs href={`/classes/${props.id}/mail`}>Send Mail!</Tabs> : null}
             </Flex>
         </Flex>
