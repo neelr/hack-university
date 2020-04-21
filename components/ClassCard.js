@@ -15,8 +15,8 @@ export default ({ sx, ...props }) => {
                 borderRadius: "20px",
                 overflow: "hidden",
                 transition: "all 0.25s",
-                m: "15px",
-                mb: "auto",
+                m: "auto",
+                mb: "30px",
                 ":hover": {
                     cursor: "pointer",
                     transform: "scale(1.03) rotate(2deg)",
