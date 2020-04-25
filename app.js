@@ -588,7 +588,12 @@ server.prepare().then(() => {
                             .eachPage((records, next) => {
                                 records.forEach(record => {
                                     if (record.id == req.params.id) {
-                                        posts = JSON.parse(record.get("Posts"))
+                                        var posts;
+                                        try {
+                                            posts = JSON.parse(record.get("Posts"))
+                                        } catch {
+                                            posts = []
+                                        }
                                         posts.map(v => {
                                             if (v.id == req.params.postId) {
                                                 v.comments.push({
