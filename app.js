@@ -471,7 +471,12 @@ server.prepare().then(() => {
                             .eachPage((records, next) => {
                                 records.forEach(record => {
                                     if (record.id == req.params.id) {
-                                        posts = JSON.parse(record.get("Posts"))
+                                        var posts;
+                                        try {
+                                            posts = JSON.parse(record.get("Posts"))
+                                        } catch {
+                                            posts = []
+                                        }
                                         posts.push({
                                             id: v4(),
                                             body: req.body.body,
@@ -510,7 +515,12 @@ server.prepare().then(() => {
                     .eachPage((records, next) => {
                         records.forEach(record => {
                             if (record.id == req.params.id) {
-                                posts = JSON.parse(record.get("Posts"))
+                                var posts;
+                                try {
+                                    posts = JSON.parse(record.get("Posts"))
+                                } catch {
+                                    posts = []
+                                }
                                 posts.map((d, i) => {
                                     if (d.id == req.params.postId) {
                                         if ((d.user == user.id) || (user.id == record.get("Leader")[0])) {
@@ -546,7 +556,12 @@ server.prepare().then(() => {
                     .eachPage((records, next) => {
                         records.forEach(record => {
                             if (record.id == req.params.id) {
-                                posts = JSON.parse(record.get("Posts"))
+                                var posts;
+                                try {
+                                    posts = JSON.parse(record.get("Posts"))
+                                } catch {
+                                    posts = []
+                                }
                                 posts.map((d, s) => {
                                     if (d.id == req.params.postId) {
                                         d.comments.map((d, i) => {
