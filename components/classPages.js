@@ -682,7 +682,7 @@ const Posts = (props) => {
                         />
                         <Textarea
                             id="body"
-                            placeholder="Body Mardown"
+                            placeholder="Body Markdown"
                             sx={{ borderRadius: "10px", width: "100%", height: "200px", m: "auto" }}
                             defaultValue={resp ? resp["Description"] : null}
                             required
