@@ -15,7 +15,7 @@
 	"dependencies": {
 		"@rebass/forms": "^4.0.6",
 		"airtable": "^0.8.1",
-		"axios": "^0.19.2",
+		"axios": "^0.21.1",
 		"cookie-parser": "^1.4.5",
 		"crypto-js": "^4.0.0",
 		"dompurify": "^2.0.8",
