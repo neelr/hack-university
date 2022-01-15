@@ -25,7 +25,7 @@
 		"isomorphic-unfetch": "^3.0.0",
 		"js-cookie": "^2.2.1",
 		"jsdom": "^16.2.2",
-		"marked": "^0.8.2",
+		"marked": "^4.0.10",
 		"next": "^9.3.3",
 		"nodemailer": "^6.4.6",
 		"react": "^16.13.1",
